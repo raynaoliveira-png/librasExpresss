@@ -1,5 +1,5 @@
 
-const URL = "https://teachablemachine.withgoogle.com/models/SEU_CODIGO_AQUI/";
+const URL = "https://teachablemachine.withgoogle.com/models/librasExpresss/";
 
 let model, webcam, maxPredictions;
 let ultimoSinal = "";
