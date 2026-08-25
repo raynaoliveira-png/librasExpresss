@@ -1,6 +1,5 @@
 
-// 1. IMPORTANTE: Substitua o link abaixo pelo SEU link do Teachable Machine
-const URL = "https://teachablemachine.withgoogle.com/models/SEU_MODELO_AQUI/";
+const URL = "https://teachablemachine.withgoogle.com/models/SEU_CODIGO_AQUI/";
 
 let model, webcam, maxPredictions;
 let ultimoSinal = "";
