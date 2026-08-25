@@ -72,5 +72,3 @@ async function predict() {
   }
 }
 
-// Inicia automaticamente
-init();
