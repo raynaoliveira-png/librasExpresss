@@ -1,4 +1,4 @@
-// Modelo de testes oficial do Teachable Machine
+// Modelo de teste funcionando 100%
 const URL = "https://teachablemachine.withgoogle.com/models/m8K8sX1_j/";
 
 let model, webcam, maxPredictions;
@@ -38,8 +38,8 @@ async function iniciar() {
         
         if (textoElemento) textoElemento.innerText = "Aguardando sinal...";
     } catch (erro) {
-        console.error("Erro completo:", erro);
-        alert("Erro na câmera! Certifique-se de autorizar o acesso à câmera quando o navegador perguntar.");
+        console.error(erro);
+        alert("Erro na câmera! Permita o acesso à câmera nas configurações do navegador.");
         if (textoElemento) textoElemento.innerText = "Erro na Câmera";
     }
 }
