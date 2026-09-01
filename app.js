@@ -1,4 +1,5 @@
-const MODEL_URL = "https://teachablemachine.withgoogle.com/models/m8K8sX1_j/";
+// Substitua a primeira linha por esta:
+const MODEL_URL = "./";
 
 let model = null;
 let maxPredictions = 0;
