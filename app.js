@@ -1,7 +1,6 @@
-// Modelo de teste funcionando 100%
 const URL = "https://teachablemachine.withgoogle.com/models/m8K8sX1_j/";
 
-let model, webcam, maxPredictions;
+let model, maxPredictions;
 let ultimoSinal = "";
 const textoElemento = document.getElementById('texto-traduzido');
 
@@ -21,51 +20,58 @@ async function iniciar() {
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
+        // Carrega o modelo de IA
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        const size = 300; 
-        const flip = true; 
-        webcam = new tmImage.Webcam(size, size, flip);
-        
-        // Ajustado para funcionar em PC e Celular sem travar
-        await webcam.setup(); 
-        await webcam.play();
-        window.requestAnimationFrame(loop);
+        // Solicita a câmera nativa do navegador (PC e Celular)
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { width: 300, height: 300 } 
+        });
+
+        // Cria o elemento de vídeo na tela
+        const videoElement = document.createElement('video');
+        videoElement.srcObject = stream;
+        videoElement.setAttribute('playsinline', true);
+        await videoElement.play();
 
         const container = document.getElementById('webcam-container');
         container.innerHTML = "";
-        container.appendChild(webcam.canvas);
-        
+        container.appendChild(videoElement);
+
         if (textoElemento) textoElemento.innerText = "Aguardando sinal...";
+        
+        // Inicia a detecção em loop no vídeo nativo
+        detectarSinal(videoElement);
+
     } catch (erro) {
         console.error(erro);
-        alert("Não foi possível acessar a câmera. Verifique se outro aplicativo não está usando a webcam.");
+        alert("Erro de acesso! Verifique se a câmera está autorizada ou se outro aplicativo está usando a webcam.");
         if (textoElemento) textoElemento.innerText = "Erro na Câmera";
     }
 }
 
-async function loop() {
-    webcam.update();
-    await predict();
-    window.requestAnimationFrame(loop);
-}
+async function detectarSinal(video) {
+    async function loop() {
+        if (model && video) {
+            const prediction = await model.predict(video);
+            let maiorProbabilidade = 0;
+            let sinalDetectado = "";
 
-async function predict() {
-    const prediction = await model.predict(webcam.canvas);
-    let maiorProbabilidade = 0;
-    let sinalDetectado = "";
+            for (let i = 0; i < maxPredictions; i++) {
+                if (prediction[i].probability > maiorProbabilidade) {
+                    maiorProbabilidade = prediction[i].probability;
+                    sinalDetectado = prediction[i].className;
+                }
+            }
 
-    for (let i = 0; i < maxPredictions; i++) {
-        if (prediction[i].probability > maiorProbabilidade) {
-            maiorProbabilidade = prediction[i].probability;
-            sinalDetectado = prediction[i].className;
+            if (maiorProbabilidade > 0.85 && sinalDetectado !== ultimoSinal) {
+                ultimoSinal = sinalDetectado;
+                if (textoElemento) textoElemento.innerText = sinalDetectado;
+                falarTexto(sinalDetectado);
+            }
         }
+        requestAnimationFrame(loop);
     }
-
-    if (maiorProbabilidade > 0.85 && sinalDetectado !== ultimoSinal) {
-        ultimoSinal = sinalDetectado;
-        if (textoElemento) textoElemento.innerText = sinalDetectado;
-        falarTexto(sinalDetectado);
-    }
+    loop();
 }
