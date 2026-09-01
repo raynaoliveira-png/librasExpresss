@@ -28,7 +28,8 @@ async function iniciar() {
         const flip = true; 
         webcam = new tmImage.Webcam(size, size, flip);
         
-        await webcam.setup({ facingMode: "user" }); 
+        // Ajustado para funcionar em PC e Celular sem travar
+        await webcam.setup(); 
         await webcam.play();
         window.requestAnimationFrame(loop);
 
@@ -39,7 +40,7 @@ async function iniciar() {
         if (textoElemento) textoElemento.innerText = "Aguardando sinal...";
     } catch (erro) {
         console.error(erro);
-        alert("Erro na câmera! Permita o acesso à câmera nas configurações do navegador.");
+        alert("Não foi possível acessar a câmera. Verifique se outro aplicativo não está usando a webcam.");
         if (textoElemento) textoElemento.innerText = "Erro na Câmera";
     }
 }
