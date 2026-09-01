@@ -17,22 +17,26 @@ async function iniciar() {
     if (textoElemento) textoElemento.innerText = "Carregando IA...";
 
     try {
+        // 1. Carrega os arquivos do Teachable Machine
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
-        // Carrega o modelo de IA
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        // Solicita a câmera nativa do navegador (PC e Celular)
+        // 2. Acesso à câmera simplificado para maior compatibilidade
         const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { width: 300, height: 300 } 
+            video: true, 
+            audio: false 
         });
 
-        // Cria o elemento de vídeo na tela
+        // 3. Monta o elemento de vídeo na tela
         const videoElement = document.createElement('video');
         videoElement.srcObject = stream;
         videoElement.setAttribute('playsinline', true);
+        videoElement.autoplay = true;
+        videoElement.muted = true;
+
         await videoElement.play();
 
         const container = document.getElementById('webcam-container');
@@ -41,19 +45,19 @@ async function iniciar() {
 
         if (textoElemento) textoElemento.innerText = "Aguardando sinal...";
         
-        // Inicia a detecção em loop no vídeo nativo
+        // 4. Executa o loop de inteligência artificial
         detectarSinal(videoElement);
 
     } catch (erro) {
-        console.error(erro);
-        alert("Erro de acesso! Verifique se a câmera está autorizada ou se outro aplicativo está usando a webcam.");
+        console.error("Detalhes do Erro:", erro);
+        alert("Não foi possível conectar à webcam. Verifique se a câmera física do notebook não está desligada por chave/botão ou em uso por outro programa.");
         if (textoElemento) textoElemento.innerText = "Erro na Câmera";
     }
 }
 
 async function detectarSinal(video) {
     async function loop() {
-        if (model && video) {
+        if (model && video && video.readyState === 4) {
             const prediction = await model.predict(video);
             let maiorProbabilidade = 0;
             let sinalDetectado = "";
